@@ -1,0 +1,4 @@
+name: aventura
+recipe: lamp
+config:
+  webroot: .

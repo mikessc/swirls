@@ -1,0 +1,5 @@
+fontawesome_block_icons_library:
+  version: "4.7.0"
+  css:
+    theme:
+      https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css: { type: external, minified: true }

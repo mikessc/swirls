@@ -1,0 +1,9 @@
+name: Fontawesome Block Icons
+type: module
+description: 'Provides a icons for block titles depending on Fontawesome Library'
+package: fontawesome block icons
+core_version_requirement: ^8 || ^9
+# Information added by Drupal.org packaging script on 2020-12-25
+version: '8.x-1.0'
+project: 'fontawesome_block_icons'
+datestamp: 1608924006

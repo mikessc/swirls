@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * @file
+ * Provides the Fontawesome options to get them saved then rendered in blocks.
+ */
+
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Template\Attribute;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\block\Entity\Block;
+
+/**
+ * Implements hook_help().
+ */
+function fontawesome_block_icons_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#fontawesome_block_icons':
+      return '<p>' . t('This module will help you get your blocks look better by adding Fontawesome icons to each one ,, Configure your block to see the options there.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function fontawesome_block_icons_form_block_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $block = $form_state->getFormObject()->getEntity();
+  // This will automatically be saved in the third party settings.
+  $form['third_party_settings']['#weight'] = 0;
+  $form['third_party_settings']['fontawesome_block_icons'] = [
+    '#type' => 'details',
+    '#title' => t('Fontawesome Block Icon'),
+    '#tree' => TRUE,
+    '#open' => TRUE,
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  ];
+  $form['third_party_settings']['fontawesome_block_icons']['icon'] = [
+    '#type' => 'textfield',
+    '#title' => t('Fontawesome Icon:'),
+    '#default_value' => $block->getThirdPartySetting('fontawesome_block_icons', 'icon'),
+    '#description' => t('You only need <b>fa-xxxx</b> out of the fontawesome class(fa-drupal):<a href="@examples-link">Examples</a>', [
+      '@examples-link' => 'https://fortawesome.github.io/Font-Awesome/icons/',
+    ]),
+  ];
+  $form['third_party_settings']['fontawesome_block_icons']['icon_size'] = [
+    '#type' => 'select',
+    '#title' => t('Size Of Icon:'),
+    '#options' => [
+      'fa-lg' => t('fa-lg'),
+      'fa-2x' => t('fa-2x'),
+      'fa-3x' => t('fa-3x'),
+      'fa-4x' => t('fa-4x'),
+      'fa-5x' => t('fa-5x'),
+    ],
+    '#default_value' => $block->getThirdPartySetting('fontawesome_block_icons', 'icon_size', 'fa-2x'),
+    '#description' => t('Set the size of fontawesome icon .. you can find more about this:<a href="@examples-link">Examples</a>.', [
+      '@examples-link' => 'https://fortawesome.github.io/Font-Awesome/examples/',
+    ]),
+    '#states' => [
+      'invisible' => [
+        ':input[name="third_party_settings[fontawesome_block_icons][icon]"]' => [
+          'value' => '',
+        ],
+      ],
+    ],
+  ];
+  $form['third_party_settings']['fontawesome_block_icons']['custom_css'] = [
+    '#type' => 'textfield',
+    '#title' => t('Custom CSS class:'),
+    '#default_value' => $block->getThirdPartySetting('fontawesome_block_icons', 'custom_css'),
+    '#size' => 30,
+    '#maxlength' => 128,
+    '#description' => t('In case you need to customize your icon'),
+    '#states' => [
+      'invisible' => [
+        ':input[name="third_party_settings[fontawesome_block_icons][icon]"]' => [
+          'value' => '',
+        ],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_block_view_alter().
+ */
+function fontawesome_block_icons_block_view_alter(array &$build, BlockPluginInterface $block) {
+  $blockIcons = Block::load($build['#id']);
+  if ($blockIcons->getThirdPartySetting('fontawesome_block_icons', 'icon') && $build['#configuration']['label_display'] === 'visible') {
+    $attributes['class'][] = "fa";
+    $vars = [
+      'icon',
+      'icon_size',
+      'custom_css',
+    ];
+    foreach ($vars as $variable) {
+      $value = $blockIcons->getThirdPartySetting('fontawesome_block_icons', $variable);
+      if (!empty($value)) {
+        $attributes['class'][] = $value;
+      }
+    }
+    $attributes = new Attribute($attributes);
+    $build['#configuration']['label'] = t("<i @attributes ></i><span> @label</span>",
+    [
+      "@label" => $build['#configuration']['label'],
+      "@attributes" => $attributes,
+    ]
+    );
+  }
+
+}
+
+/**
+ * Implements hook_page_attachments() for *.html.twig.
+ */
+function fontawesome_block_icons_page_attachments(array &$page) {
+  $page['#attached']['library'][] = 'fontawesome_block_icons/fontawesome_block_icons_library';
+}
